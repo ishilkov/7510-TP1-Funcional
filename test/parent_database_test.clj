@@ -2,34 +2,21 @@
   (:require [clojure.test :refer :all]
             [logical-interpreter :refer :all]))
 
-(def ex-facts {"varon" [["jose"] ["pepe"] ["marcos"]],
-             "mujer" [["vero"] ["maria"]],
-             "padre" [["jose" "pepe"] ["jose" "marcos"] ["jose" "vero"]]})
-(def ex-rules {"hijo" {:prop {:rule "hijo", :temp ["X" "Y"]}, :conds [{:fact "varon", :temp ["X"]} {:fact "padre", :temp ["Y" "X"]}]},
-             "hija" {:prop {:rule "hija", :temp ["X" "Y"]}, :conds [{:fact "mujer", :temp ["X"]} {:fact "padre", :temp ["Y" "X"]}]}
-             })
-
-(def ex-prop {:rule "hija", :vals ["vero" "jose"]})
-(def ex-cond1 {:fact "varon", :temp ["X"]})
-(def ex-cond2 {:fact "padre", :temp ["Y" "X"]})
-
-
-
 (def parent-database "
-	varon(juan)
-	varon(pepe)
-	varon(hector)
-	varon(roberto)
-	varon(alejandro)
-	mujer(maria)
-	mujer(cecilia)
-	padre(juan,pepe)
-	padre(juan,pepa)
-	padre(hector,maria)
-	padre(roberto,alejandro)
-	padre(roberto,cecilia)
-	hijo(X,Y):-varon(X),padre(Y,X)
-	hija(X,Y):-mujer(X),padre(Y,X)
+	varon(juan).
+	varon(pepe).
+	varon(hector).
+	varon(roberto).
+	varon(alejandro).
+	mujer(maria).
+	mujer(cecilia).
+	padre(juan, pepe).
+	padre(juan, pepa).
+	padre(hector, maria).
+	padre(roberto ,alejandro).
+	padre(roberto,cecilia).
+	hijo(X, Y):-varon(X),padre(Y, X).
+	hija(X, Y):-mujer(X),padre(Y, X).
 ")
 
 (deftest parent-database-fact-test

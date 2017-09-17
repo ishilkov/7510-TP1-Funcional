@@ -8,10 +8,21 @@
   (get rules (get prop :rule))
   )
 
+(defn get-fact
+  [facts prop]
+  (get facts (get prop :rule))
+  )
+
 (defn build-atom
   [entry atom-type value-type]
-  (let [prop (zipmap [:expr atom-type value-type] (re-matches #"(\w+)\((\w+[,\w]*)\)"  entry))]
-    {atom-type (get prop atom-type), value-type (re-seq #"\w+" (get prop value-type))}
+  (let [matches (re-matches #"\s*(\w+)\s*\((\s*\w+\s*[,\s*\w+\s*]*)\)\s*"  entry)
+        ]
+    (if (nil? matches)
+      (throw (ex-info "Incorrect lexical definition" {:type :lexical-definition}))
+      (let [prop (zipmap [:expr atom-type value-type] matches)]
+        {atom-type (get prop atom-type), value-type (re-seq #"\w+" (get prop value-type))}
+        )
+      )
     )
   )
 
@@ -22,7 +33,7 @@
 
 (defn build-conditions
   [entry]
-  (let [cond-exp (re-seq #"\w+\(\w+[,\w]*\)" entry)]
+  (let [cond-exp (re-seq #"\s*\w+\s*\(\s*\w+\s*[,\s*\w\s*]*\)" entry)]
     (map #(build-atom %1 :fact :temp) cond-exp)
     )
   )
@@ -53,13 +64,21 @@
     )
   )
 
-(defn build-base
+(defn build-base-from-parsed
   [entries]
   (doseq [entry entries]
      (build-entry entry)
      )
     {:rules rules, :facts facts}
   )
+
+(defn build-base
+  [database]
+  (build-base-from-parsed (clojure.string/split
+                            (clojure.string/replace database
+                                                    #"[\t\n]"
+                                                    "")
+                            #"\.")))
 
 
 
